@@ -1,62 +1,93 @@
-const bcrypt = require("bcryptjs"); // For hashing passwords
-const jwt = require("jsonwebtoken"); // For generating tokens
-const pool = require("../config/db"); // Database connection
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const pool = require('../config/db');  // Import your database connection pool
 
-// Register User
-const registerUser = async (req, res) => {
-  const { username, email, password } = req.body;
+// Register a new user
+const register = async (req, res) => {
+  const { name, email, password, role } = req.body; // Get user data from the request body
+
+  // Check if all fields are provided
+  if (!name || !email || !password || !role) {
+    return res.status(400).json({ message: 'Please provide all required fields' });
+  }
 
   try {
     // Check if the user already exists
-    const existingUser = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    
     if (existingUser.rows.length > 0) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Hash the password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    // Hash the user's password before storing it in the database
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Insert the new user into the database
-    const newUser = await pool.query(
-      "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email",
-      [username, email, hashedPassword]
+    const result = await pool.query(
+      'INSERT INTO users (name, email, password, role, created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING id, name, email, role, created_at',
+      [name, email, hashedPassword, role]
     );
 
-    // Respond with the newly created user
-    res.status(201).json({ message: "User registered", user: newUser.rows[0] });
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).json({ message: "Server error" });
+    // Send a success response
+    res.status(201).json({
+      message: 'User registered successfully!',
+      user: result.rows[0],
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Login User
-const loginUser = async (req, res) => {
+// Log in a user
+const login = async (req, res) => {
   const { email, password } = req.body;
 
+  // Check if email and password are provided
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Please provide both email and password' });
+  }
+
   try {
-    // Check if the user exists
-    const user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-    if (user.rows.length === 0) {
-      return res.status(400).json({ message: "Invalid credentials" });
+    // Find the user by email
+    const userResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    
+    if (userResult.rows.length === 0) {
+      return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Compare the password with the hashed password in the database
-    const isMatch = await bcrypt.compare(password, user.rows[0].password);
+    const user = userResult.rows[0];
+
+    // Compare the entered password with the hashed password in the database
+    const isMatch = await bcrypt.compare(password, user.password);
+    
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Generate a JWT token
-    const token = jwt.sign({ id: user.rows[0].id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    // Generate a JWT token (for authentication)
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
 
-    res.status(200).json({ message: "Login successful", token });
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).json({ message: "Server error" });
+    // Send response with the token and user data (without password)
+    res.json({
+      message: 'Login successful',
+      token,
+      user: {
+        id: user.id,
+        name: user.name,  // Changed to 'name' instead of 'user'
+        email: user.email,
+        role: user.role,
+        created_at: user.created_at,
+      },
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-module.exports = { registerUser, loginUser };
-
+module.exports = { register, login };
