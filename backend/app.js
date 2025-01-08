@@ -1,26 +1,19 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const cors = require("cors");
-
-// Import routes
-const authRoutes = require("./routes/authRoutes");
-
-// Load environment variables
-dotenv.config();
-
-// Create Express app
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const app = express();
 
-// Middleware
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// API Routes
-app.use("/auth", authRoutes);
+// Simple route
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to the job portal application.' });
+});
 
-// Test route
-app.get("/", (req, res) => res.send("Welcome to the E-commerce API"));
-
-// Start the server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Set port, listen for requests
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}.`);
+});
