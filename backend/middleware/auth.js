@@ -6,7 +6,7 @@ exports.createToken = (id, email) => {
   const token = jwt.sign(
     { id, email },
     process.env.SECRET,
-    { expiresIn: '5d' }
+    { expiresIn: '5d' } // Consider changing the expiration time for enhanced security if needed
   );
   return token;
 };
@@ -26,7 +26,7 @@ exports.isAuthenticated = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.SECRET);
 
     // Use Sequelize to find user by ID
-    const user = await User.findByPk(decoded.id);  // Replace `User.findById()` with `User.findByPk()`
+    const user = await User.findByPk(decoded.id);  // Replaced `findById` with `findByPk`
 
     if (!user) {
       return res.status(404).json({
@@ -35,12 +35,13 @@ exports.isAuthenticated = async (req, res, next) => {
       });
     }
 
-    req.user = user;
-    next();
+    req.user = user; // Attach user to the request object
+    next(); // Proceed to the next middleware
   } catch (err) {
+    console.error(err); // Log the error for debugging
     res.status(500).json({
       success: false,
-      message: err.message,
+      message: err.message || 'Internal server error',
     });
   }
 };
