@@ -55,3 +55,29 @@ exports.getAllApp = async (req, res) => {
         });
     }
 };
+// Update Application Status
+exports.updateApplication = async (req, res) => {
+    try {
+        const application = await Application.findByPk(req.params.id); // Sequelize equivalent of find by ID
+
+        if (!application) {
+            return res.status(404).json({
+                success: false,
+                message: 'Application not found'
+            });
+        }
+
+        application.status = req.body.status; // Update status
+        await application.save(); // Save changes
+
+        res.status(200).json({
+            success: true,
+            message: 'Application Updated'
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
