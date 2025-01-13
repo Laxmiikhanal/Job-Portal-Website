@@ -40,3 +40,6 @@ router.route("/admin/deleteApplication/:id")
 // Get a user by ID
 router.route("/admin/getUser/:id")
   .get(isAuthenticated, authorizationRoles("admin"), userIdValidator(), validateHandler, getUser);
+// Update user details
+router.route("/admin/updateUser/:id")
+  .put(isAuthenticated, authorizationRoles("admin"), userIdValidator(), validateHandler, updateUser);
