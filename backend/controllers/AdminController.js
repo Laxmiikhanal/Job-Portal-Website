@@ -211,3 +211,44 @@ exports.getUser = async (req, res) => {
         });
     }
 };
+// Update Job
+exports.updateJob = async (req, res) => {
+    try {
+        const job = await Job.findByPk(req.params.id); // Sequelize equivalent of find by ID
+
+        if (!job) {
+            return res.status(404).json({
+                success: false,
+                message: 'Job not found'
+            });
+        }
+
+        // Cloudinary handling for job logo
+        const logoToDelete_Id = job.companyLogo.public_id;
+        await cloudinary.v2.uploader.destroy(logoToDelete_Id);
+
+        const logo = req.body.companyLogo;
+
+        const myCloud = await cloudinary.v2.uploader.upload(logo, {
+            folder: 'logo',
+            crop: 'scale',
+        });
+
+        req.body.companyLogo = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url
+        };
+
+        await job.update(req.body); // Update job using Sequelize's `update` method
+
+        res.status(200).json({
+            success: true,
+            message: 'Job Updated'
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
