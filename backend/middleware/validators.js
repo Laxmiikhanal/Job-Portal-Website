@@ -81,3 +81,53 @@ exports.register = async (req, res) => {
     });
   }
 };
+
+// Login
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Validate input fields
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide email and password',
+      });
+    }
+
+    // Find the user by email
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User does not exist',
+      });
+    }
+
+    // Compare the password with the hashed password
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Wrong Password',
+      });
+    }
+
+    // Generate token
+    const token = createToken(user.id, user.email);
+
+    res.status(200).json({
+      success: true,
+      message: 'User logged in successfully',
+      token,
+    });
+  } catch (err) {
+    console.error(err); // Log the error for debugging
+    res.status(500).json({
+      success: false,
+      message: err.message || 'Internal server error',
+    });
+  }
+};
