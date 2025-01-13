@@ -43,3 +43,6 @@ router.route("/admin/getUser/:id")
 // Update user details
 router.route("/admin/updateUser/:id")
   .put(isAuthenticated, authorizationRoles("admin"), userIdValidator(), validateHandler, updateUser);
+  // Delete a user
+router.route("/admin/deleteUser/:id")
+.delete(isAuthenticated, authorizationRoles("admin"), userIdValidator(), validateHandler, deleteUser);
