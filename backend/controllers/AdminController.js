@@ -17,6 +17,7 @@ exports.getAllJobs = async (req, res) => {
         });
     }
 };
+
 // Get all Users
 exports.getAllUsers = async (req, res) => {
     try {
@@ -55,6 +56,7 @@ exports.getAllApp = async (req, res) => {
         });
     }
 };
+
 // Update Application Status
 exports.updateApplication = async (req, res) => {
     try {
@@ -81,6 +83,7 @@ exports.updateApplication = async (req, res) => {
         });
     }
 };
+
 // Delete Application
 exports.deleteApplication = async (req, res) => {
     try {
@@ -106,6 +109,7 @@ exports.deleteApplication = async (req, res) => {
         });
     }
 };
+
 // Get Application
 exports.getApplication = async (req, res) => {
     try {
@@ -211,6 +215,7 @@ exports.getUser = async (req, res) => {
         });
     }
 };
+
 // Update Job
 exports.updateJob = async (req, res) => {
     try {
