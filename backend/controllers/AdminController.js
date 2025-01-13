@@ -17,3 +17,19 @@ exports.getAllJobs = async (req, res) => {
         });
     }
 };
+// Get all Users
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.findAll(); // Sequelize equivalent of finding all users
+
+        res.status(200).json({
+            success: true,
+            users
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
