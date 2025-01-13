@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const { user } = require('../models'); // Import User model
+const { User } = require('../models'); // Import User model
 const { createToken } = require('../middlewares/auth');
 const cloudinary = require('cloudinary');
 
