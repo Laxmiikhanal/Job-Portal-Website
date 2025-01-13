@@ -52,3 +52,6 @@ router.route("/admin/getJob/:id")
 // Update a job
 router.route("/admin/updateJob/:id")
   .put(isAuthenticated, authorizationRoles("admin"), JobIdValidator(), validateHandler, updateJob);
+// Delete a job
+router.route("/admin/deleteJob/:id")
+  .delete(isAuthenticated, authorizationRoles("admin"), JobIdValidator(), validateHandler, deleteJob);
