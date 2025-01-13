@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken');
-const { User } = require('../models'); // Make sure to import User from Sequelize
+const { User } = require('../models'); // Ensure User is imported from Sequelize
 
-// Function to create token
+// Function to create a JWT token
 exports.createToken = (id, email) => {
   const token = jwt.sign(
     { id, email },
-    process.env.SECRET,
-    { expiresIn: '5d' } // Consider changing the expiration time for enhanced security if needed
+    process.env.SECRET,  // You should have this in your .env file
+    { expiresIn: '5d' }  // Expiry time for the token (can be adjusted for your needs)
   );
   return token;
 };
@@ -14,7 +14,8 @@ exports.createToken = (id, email) => {
 // Middleware to check if the user is authenticated
 exports.isAuthenticated = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1]; // Get the token from Authorization header
+    // Get the token from the 'Authorization' header
+    const token = req.headers.authorization?.split(' ')[1]; // Format: Bearer <token>
     
     if (!token) {
       return res.status(401).json({
@@ -23,10 +24,11 @@ exports.isAuthenticated = async (req, res, next) => {
       });
     }
 
+    // Verify the token using the secret key
     const decoded = jwt.verify(token, process.env.SECRET);
 
-    // Use Sequelize to find user by ID
-    const user = await User.findByPk(decoded.id);  // Replaced `findById` with `findByPk`
+    // Find the user by ID (primary key) using Sequelize
+    const user = await User.findByPk(decoded.id);  // Using Sequelize `findByPk`
 
     if (!user) {
       return res.status(404).json({
@@ -35,13 +37,29 @@ exports.isAuthenticated = async (req, res, next) => {
       });
     }
 
-    req.user = user; // Attach user to the request object
-    next(); // Proceed to the next middleware
+    // Attach the user object to the request object (for use in next middlewares/controllers)
+    req.user = user;
+
+    // Proceed to the next middleware or controller
+    next();
   } catch (err) {
-    console.error(err); // Log the error for debugging
-    res.status(500).json({
-      success: false,
-      message: err.message || 'Internal server error',
-    });
+    // Handle the error based on error type
+    if (err.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid Token',
+      });
+    } else if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token Expired',
+      });
+    } else {
+      console.error(err);  // Log the error for debugging
+      return res.status(500).json({
+        success: false,
+        message: err.message || 'Internal server error',
+      });
+    }
   }
 };
