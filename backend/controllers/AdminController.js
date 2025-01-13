@@ -106,4 +106,32 @@ exports.deleteApplication = async (req, res) => {
         });
     }
 };
+// Get Application
+exports.getApplication = async (req, res) => {
+    try {
+        const application = await Application.findByPk(req.params.id, {
+            include: [
+                { model: Job, as: 'job' }, // Populate job
+                { model: User, as: 'applicant' } // Populate applicant
+            ]
+        });
+
+        if (!application) {
+            return res.status(404).json({
+                success: false,
+                message: 'Application not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            application
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
 
