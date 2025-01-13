@@ -252,3 +252,27 @@ exports.updateJob = async (req, res) => {
         });
     }
 };
+
+// Get Single Job
+exports.getJob = async (req, res) => {
+    try {
+        const job = await Job.findByPk(req.params.id); // Sequelize equivalent of find by ID
+
+        if (!job) {
+            return res.status(404).json({
+                success: false,
+                message: 'Job not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            job
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
