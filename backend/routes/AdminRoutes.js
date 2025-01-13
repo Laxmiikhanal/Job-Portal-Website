@@ -31,3 +31,6 @@ router.route("/admin/allApp").get(isAuthenticated, authorizationRoles("admin"), 
 // Get a specific application by ID
 router.route("/admin/getApplication/:id")
   .get(isAuthenticated, authorizationRoles("admin"), applicationIdValidator(), validateHandler, getApplication);
+// Update application status
+router.route("/admin/updateApplication/:id")
+  .put(isAuthenticated, authorizationRoles("admin"), applicationIdValidator(), validateHandler, updateApplication);
