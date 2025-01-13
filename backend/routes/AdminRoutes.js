@@ -28,3 +28,6 @@ router.route("/admin/allJobs").get(isAuthenticated, authorizationRoles("admin"),
 router.route("/admin/allUsers").get(isAuthenticated, authorizationRoles("admin"), getAllUsers);
 // Get all applications
 router.route("/admin/allApp").get(isAuthenticated, authorizationRoles("admin"), getAllApp);
+// Get a specific application by ID
+router.route("/admin/getApplication/:id")
+  .get(isAuthenticated, authorizationRoles("admin"), applicationIdValidator(), validateHandler, getApplication);
