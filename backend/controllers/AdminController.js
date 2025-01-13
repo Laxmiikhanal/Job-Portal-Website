@@ -161,3 +161,30 @@ exports.updateUser = async (req, res) => {
         });
     }
 };
+
+// Delete User
+exports.deleteUser = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.params.id); // Sequelize equivalent of find by ID
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        await user.destroy(); // Delete user
+
+        res.status(200).json({
+            success: true,
+            message: 'User Deleted'
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
