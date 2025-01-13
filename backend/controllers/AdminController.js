@@ -276,3 +276,29 @@ exports.getJob = async (req, res) => {
         });
     }
 };
+
+// Delete Single Job
+exports.deleteJob = async (req, res) => {
+    try {
+        const job = await Job.findByPk(req.params.id); // Sequelize equivalent of find by ID
+
+        if (!job) {
+            return res.status(404).json({
+                success: false,
+                message: 'Job not found'
+            });
+        }
+
+        await job.destroy(); // Delete job using Sequelize's `destroy` method
+
+        res.status(200).json({
+            success: true,
+            message: 'Job Deleted'
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
