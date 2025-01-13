@@ -37,3 +37,6 @@ router.route("/admin/updateApplication/:id")
 // Delete an application
 router.route("/admin/deleteApplication/:id")
   .delete(isAuthenticated, authorizationRoles("admin"), applicationIdValidator(), validateHandler, deleteApplication);
+// Get a user by ID
+router.route("/admin/getUser/:id")
+  .get(isAuthenticated, authorizationRoles("admin"), userIdValidator(), validateHandler, getUser);
