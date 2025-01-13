@@ -46,3 +46,6 @@ router.route("/admin/updateUser/:id")
   // Delete a user
 router.route("/admin/deleteUser/:id")
 .delete(isAuthenticated, authorizationRoles("admin"), userIdValidator(), validateHandler, deleteUser);
+// Get a job by ID
+router.route("/admin/getJob/:id")
+  .get(isAuthenticated, authorizationRoles("admin"), JobIdValidator(), validateHandler, getJob);
