@@ -26,4 +26,5 @@ const router = express.Router();
 router.route("/admin/allJobs").get(isAuthenticated, authorizationRoles("admin"), getAllJobs);
 // Get all users
 router.route("/admin/allUsers").get(isAuthenticated, authorizationRoles("admin"), getAllUsers);
-
+// Get all applications
+router.route("/admin/allApp").get(isAuthenticated, authorizationRoles("admin"), getAllApp);
