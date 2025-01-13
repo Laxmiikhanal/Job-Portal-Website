@@ -49,3 +49,6 @@ router.route("/admin/deleteUser/:id")
 // Get a job by ID
 router.route("/admin/getJob/:id")
   .get(isAuthenticated, authorizationRoles("admin"), JobIdValidator(), validateHandler, getJob);
+// Update a job
+router.route("/admin/updateJob/:id")
+  .put(isAuthenticated, authorizationRoles("admin"), JobIdValidator(), validateHandler, updateJob);
