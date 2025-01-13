@@ -135,3 +135,29 @@ exports.getApplication = async (req, res) => {
     }
 };
 
+// Update User Role
+exports.updateUser = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.params.id); // Sequelize equivalent of find by ID
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        user.role = req.body.role; // Update role
+        await user.save(); // Save changes
+
+        res.status(200).json({
+            success: true,
+            message: 'User Updated'
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
