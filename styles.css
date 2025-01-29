@@ -24,7 +24,7 @@ body {
     background-color: #e7f6e7;
     display: flex;
     justify-content: center;
-    align-items: center;
+    /* align-items: center; */
     padding: 20px;
 }
 
@@ -72,5 +72,5 @@ body {
 }
 
 .form-container button:hover {
-    background: linear-gradient(to right, #2f80ed, #56ccf2);
+    background: linear-gradient(to right, #2f80ed,#56ccf2);
 }
