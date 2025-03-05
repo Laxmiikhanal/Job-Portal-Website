@@ -1,29 +1,48 @@
-const express = require('express');
-const { register, login, isLogin, me, changePassword, updateProfile, deleteAccount } = require('../controllers/UserController');
-const { isAuthenticated } = require('../middlewares/auth');
-const { registerValidator, validateHandler, loginValidator, changePasswordValidator, updateProfileValidator, deleteAccountValidator } = require('../middlewares/validators');
-
+const express = require("express");
 const router = express.Router();
+const { register, login, isLogin, me, changePassword, updateProfile, deleteAccount } = require("../controllers/UserControllers");
+const upload = require("../config/multerConfig"); // Import Multer configuration
+const { isAuthenticated, authorizationRoles } = require("../middlewares/auth"); // Import auth middleware
+const { registerValidator, validateHandler, loginValidator, changePasswordValidator, updateProfileValidator, deleteAccountValidator } = require("../middlewares/validators");
 
-// Register User
-router.route("/register").post(registerValidator(), validateHandler, register);
+// Register route with Multer for file uploads
+router.post(
+  "/auth/register",
+  upload.fields([
+    { name: "avatar", maxCount: 1 }, // Handle avatar file
+    { name: "resume", maxCount: 1 }, // Handle resume file
+  ]),
+  registerValidator(),
+  validateHandler,
+  register
+);
 
-// Login User
-router.route("/login").post(loginValidator(), validateHandler, login);
+// Login route
+router.post("/auth/login", loginValidator(), validateHandler, login);
 
-// Check if User is Logged In
-router.route("/isLogin").get(isAuthenticated, isLogin);
+// Check login status
+router.get("/auth/status", isLogin);
 
-// Get Current User Profile
-router.route("/me").get(isAuthenticated, me);
+// Get logged-in user profile (protected route)
+router.get("/auth/me", isAuthenticated, me);
 
-// Change User Password
-router.route("/changePassword").patch(isAuthenticated, changePasswordValidator(), validateHandler, changePassword);
+// Change password (protected route)
+router.put("/auth/password/change", isAuthenticated, changePasswordValidator(), validateHandler, changePassword);
 
-// Update User Profile
-router.route("/updateProfile").patch(isAuthenticated, updateProfileValidator(), validateHandler, updateProfile);
+// Update profile (protected route)
+router.put(
+  "/auth/profile/update",
+  isAuthenticated,
+  upload.fields([
+    { name: "avatar", maxCount: 1 }, // Handle avatar file
+    { name: "resume", maxCount: 1 }, // Handle resume file
+  ]),
+  updateProfileValidator(),
+  validateHandler,
+  updateProfile
+);
 
-// Delete User Account
-router.route("/deleteAccount").delete(isAuthenticated, deleteAccountValidator(), validateHandler, deleteAccount);
+// Delete account (protected route)
+router.delete("/auth/account/delete", isAuthenticated, deleteAccountValidator(), validateHandler, deleteAccount);
 
 module.exports = router;
